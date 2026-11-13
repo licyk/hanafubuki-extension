@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/licyk/hanafubuki-extension/main/schema/extensions.schema.json",
+  "title": "Hanafubuki extension registry",
+  "type": "object",
+  "required": [
+    "schema",
+    "extensions"
+  ],
+  "properties": {
+    "schema": {
+      "const": 1
+    },
+    "extensions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entry"
+      }
+    }
+  },
+  "$defs": {
+    "text": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      ],
+      "description": "Text, or an object of language code to text (en, zh, ...)."
+    },
+    "entry": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "author",
+        "reference"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-z0-9-]+(\\.[a-z0-9-]+)+$",
+          "description": "The extension manifest's id: reverse-DNS, two or more labels of [a-z0-9-] joined by dots."
+        },
+        "name": {
+          "$ref": "#/$defs/text"
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "$ref": "#/$defs/text"
+        },
+        "reference": {
+          "type": "string",
+          "pattern": "^https?://",
+          "description": "The source repository."
+        },
+        "download_url": {
+          "type": "string",
+          "pattern": "^https?://",
+          "description": "An installable archive: .zip, .tar, .tar.gz, .tar.xz or .tar.bz2."
+        },
+        "update_url": {
+          "type": "string",
+          "pattern": "^https?://",
+          "description": "The extension's latest.json."
+        }
+      }
+    }
+  }
+}
