@@ -12,6 +12,7 @@ import re
 import sys
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 REGISTRY = Path(__file__).resolve().parent.parent / "extensions.json"
 SCHEMA = 1
@@ -106,7 +107,26 @@ def check_entry(entry: dict[str, Any]) -> list[str]:
         value = entry.get(field)
         if field in entry and not (isinstance(value, str) and URL.fullmatch(value)):
             problems.append(f"`{field}` must be an http(s) URL")
+    download = entry.get("download_url")
+    if (
+        isinstance(download, str)
+        and URL.fullmatch(download)
+        and not names_a_file(download)
+    ):
+        problems.append("`download_url` must name an archive file, not end in `/`")
     return problems
+
+
+def names_a_file(url: str) -> bool:
+    """Tell whether a URL's path ends in a file name, as Hanafubuki requires.
+
+    Args:
+        url: An http(s) URL.
+
+    Returns:
+        Whether the last segment of its path is not empty.
+    """
+    return bool(urlsplit(url).path.rsplit("/", 1)[-1])
 
 
 def non_empty_text(value: Any) -> bool:
